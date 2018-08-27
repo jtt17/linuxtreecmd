@@ -5,10 +5,16 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
+	"os"
+	"strconv"
 )
 
 func tree(pre, path string, level int) {
-	tmppath := path[strings.LastIndex(path, "\\"):]
+	id := strings.LastIndex(path,"/")
+	if id == -1 {
+		id = 0
+	}
+	tmppath := path[id:]
 	fmt.Println(pre + "|---" + tmppath)
 	pre += "|   "
 	if level <= 0 {
@@ -17,7 +23,7 @@ func tree(pre, path string, level int) {
 	files, err := ioutil.ReadDir(path)
 
 	if err != nil {
-		fmt.Println("read path failed ", err)
+		fmt.Printf("read path: %s  failed : %v\n",path, err)
 		return
 	}
 
@@ -32,7 +38,21 @@ func tree(pre, path string, level int) {
 }
 
 func main() {
-	path := filepath.Join("D:\\")
-
-	tree("", path, 3)
+	var path string
+	var level int
+	var err error
+	if len(os.Args) == 1 {
+		path,err = os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		level = 999999999
+	} else {
+		path = os.Args[1]
+		level ,err= strconv.Atoi(os.Args[2])
+		if err != nil {
+			panic(err)
+		}
+	}
+	tree("",path,level)
 }
